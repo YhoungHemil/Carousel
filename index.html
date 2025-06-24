@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Working Fashion Video Carousel</title>
+  <style>
+    body {
+      font-family: 'Sora', sans-serif;
+      margin: 0;
+      padding: 0;
+      background:#f1f8fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      overflow: hidden;
+      margin: 2rem;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease;
+      gap: 1rem;
+    }
+
+    .card {
+      flex: 0 0 auto;
+      width: 300px;
+      height: 180px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #fff;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .card video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #8164f4;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    .controls button {
+      background: #8164f4;
+      border: none;
+      color: #fff;
+      padding: 10px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .modal-content video {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #fff;
+      color: #333;
+      font-size: 20px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="carousel-container">
+  <div class="carousel-track" id="carouselTrack">
+    <!-- Cards will be dynamically loaded here -->
+  </div>
+  <div class="controls">
+    <button onclick="scrollCarousel(-1)">❮</button>
+    <button onclick="scrollCarousel(1)">❯</button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="videoModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <video id="modalVideo" controls autoplay></video>
+  </div>
+</div>
+
+<script>
+  const carousel = document.getElementById('carouselTrack');
+  const modal = document.getElementById('videoModal');
+  const modalVideo = document.getElementById('modalVideo');
+  let scrollIndex = 0;
+  let cards = [];
+
+  // Scroll left/right
+  function scrollCarousel(direction) {
+    if (!cards.length) return;
+    const cardWidth = cards[0].offsetWidth + 16;
+    scrollIndex += direction;
+    if (scrollIndex < 0) scrollIndex = cards.length - 1;
+    if (scrollIndex >= cards.length) scrollIndex = 0;
+    carousel.style.transform = `translateX(-${cardWidth * scrollIndex}px)`;
+  }
+
+  // Auto scroll
+  setInterval(() => {
+    scrollCarousel(1);
+  }, 4000);
+
+  // Close modal
+  function closeModal() {
+    modal.style.display = 'none';
+    modalVideo.pause();
+    modalVideo.src = '';
+  }
+
+  // Load videos dynamically and set up events
+  window.onload = async () => {
+    try {
+      const res = await fetch("/.netlify/functions/get-videos");
+      const videos = await res.json();
+
+      carousel.innerHTML = '';
+      scrollIndex = 0;
+
+      videos.forEach(video => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <video src="${video.url}" preload="metadata"></video>
+          <button class="play-btn">▶</button>
+        `;
+        carousel.appendChild(card);
+      });
+
+      cards = document.querySelectorAll('.card');
+
+      // Setup modal play button listeners
+      document.querySelectorAll('.play-btn').forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+          const video = cards[index].querySelector('video');
+          modal.style.display = 'flex';
+          modalVideo.src = video.src;
+          modalVideo.play();
+        });
+      });
+
+    } catch (err) {
+      console.error("Failed to load videos:", err);
+    }
+  };
+</script>
+
+</body>
+</html>
