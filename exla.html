@@ -1,0 +1,103 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<style>
+body {
+  top: 0px !important;
+}
+
+/* Variables used directly */
+.goog-te-gadget-simple {
+  background-color: rgba(255,255,255,0.5) !important;
+  border: 1px solid black !important;
+  padding: 0.2em !important;
+  border-radius: 4px !important;
+  font-size: 1rem !important;
+  line-height: 2rem !important;
+  display: inline-block;
+  cursor: pointer;
+}
+
+#google_translate_element {
+  z-index: 100;
+  position: fixed;
+  right: 2vw;
+  bottom: 1vh;
+}
+
+.goog-te-menu2 {
+  max-width: 200px;
+}
+
+.goog-te-menu2 table td {
+  padding: 6px !important;
+  white-space: nowrap;
+}
+
+.goog-te-menu2 table td img {
+  width: 20px;
+  height: 15px;
+  margin-right: 8px;
+  vertical-align: middle;
+  object-fit: cover;
+}
+
+.goog-te-gadget-icon, .goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+</style>
+
+<div id="google_translate_element">
+<p>What is PortaFlux?  PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content. Whether you're browsing the latest headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality content,right when you need it.
+  
+  It’s not just a content hub, it’s your daily destination for staying connected, learning something new, and discovering what matters.
+  
+  Key Features of PortaFlux:
+  
+  1. Daily News Feed
+  
+  </p>
+  </div>
+
+<script>
+  var GoogleLanguages = 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';
+
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: GoogleLanguages,
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  const langToFlag = {
+    en: 'us', ar: 'sa', ja: 'jp', ko: 'kr', fr: 'fr',
+    sv: 'se', is: 'is', ro: 'ro', fi: 'fi', et: 'ee',
+    it: 'it', 'zh-CN': 'cn', tl: 'ph'
+  };
+
+  const addFlags = () => {
+    $('.goog-te-menu2 table td').each(function(){
+      const $td = $(this);
+      const txt = $td.text().trim();
+      for(let code in langToFlag){
+        if(txt.toLowerCase().includes(code.toLowerCase()) && $td.find('img').length===0){
+          const flag = langToFlag[code];
+          $('<img>', {
+            src: `https://flagcdn.com/w20/${flag}.png`,
+            alt: code
+          }).prependTo($td);
+          break;
+        }
+      }
+    });
+  };
+
+  let mo = new MutationObserver(addFlags);
+  mo.observe(document.body, { subtree: true, childList: true });
+</script>
