@@ -131,20 +131,21 @@
 <body>
   <div class="upload-container">
     <h3>Admin Video Upload</h3>
-
-    <label>Video File:</label>
-    <input type="file" id="videoInput" accept="video/*">
-
+        <label>Video File:</label>
+<form action="/.netlify/functions/upload-video" method="POST" enctype="multipart/form-data">
+  
     <label>Video Title:</label>
-    <input type="text" id="videoTitle" placeholder="Top Breaking News">
-
-    <label>Thumbnail URL:</label>
-    <input type="text" id="thumbnailUrl" placeholder="https://example.com/thumb.jpg">
-
+  <input type="text" name="title" placeholder="Video Title" />
+  <label>Thumbnail URL:</label>
+  <input type="text" name="thumbnail" placeholder="Thumbnail URL" />
+ 
     <label>Category:</label>
-    <input type="text" id="category" placeholder="News / Movies / Sports">
-
-    <button onclick="uploadVideo()">Upload</button>
+  
+  <input type="text" name="category" placeholder="Category" />
+  <input type="file" name="video" accept="video/*" />
+  <button onclick="uploadVideo()">Upload</button>
+  
+</form>
   </div>
   <script>
     async function uploadVideo() {
