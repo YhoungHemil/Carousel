@@ -21,6 +21,12 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  // Decode body if base64-encoded
+  const isBase64 = event.isBase64Encoded;
+  const bodyBuffer = isBase64
+    ? Buffer.from(event.body, "base64")
+    : Buffer.from(event.body, "utf8");
+
   return new Promise((resolve, reject) => {
     const bb = busboy({ headers: event.headers });
 
@@ -55,17 +61,17 @@ exports.handler = async (event) => {
         const stream = Readable.from(uploadData.buffer);
 
         await new Promise((res, rej) => {
-          stream.pipe(file.createWriteStream({
-            metadata: { contentType: uploadData.mimetype },
-          }))
-          .on("error", rej)
-          .on("finish", res);
+          stream
+            .pipe(file.createWriteStream({
+              metadata: { contentType: uploadData.mimetype },
+            }))
+            .on("error", rej)
+            .on("finish", res);
         });
 
         await file.makePublic();
         const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
 
-        // Save metadata to Firestore
         await db.collection("videos").add({
           url: publicUrl,
           title: fields.title || "",
@@ -85,6 +91,6 @@ exports.handler = async (event) => {
       }
     });
 
-    bb.end(Buffer.from(event.body, "base64"));
+    bb.end(bodyBuffer);
   });
 };
