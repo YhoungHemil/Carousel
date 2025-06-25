@@ -1,2 +1,7 @@
-[build]
-  functions = "functions"
+[functions]
+  node_bundler = "esbuild"
+
+[functions.upload-video]
+  included_files = ["path/to/firebase-service-account.json"] # if you're using a local credential
+  node_bundler = "esbuild"
+  external_node_modules = ["busboy"]
