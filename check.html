@@ -1,0 +1,242 @@
+<!-- Material Icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<!-- Flag Icons CDN (SVG via country-flag-icons) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.5/css/flag-icons.min.css" />
+
+<style>
+/* Variables */
+@translate-bg: rgba(255, 255, 255, 0.5) !important;
+@translate-border: black !important;
+@downicon-color: red;
+@langicon-color: blue;
+@translate-text-color: black;
+@translate-font: sans-serif;
+
+body {
+  top: 0px !important;
+}
+
+#google_translate_element {
+  z-index: 100;
+  border-radius: 0;
+  right: 2vw;
+  left: auto;
+  position: fixed;
+  bottom: 1vh;
+}
+
+/* Dropdown Button Styling */
+.goog-te-gadget-simple {
+  background-color: @translate-bg !important;
+  border: 1px solid @translate-border !important;
+  padding: 0.2em 0.5em !important;
+  border-radius: 6px !important;
+  font-size: 1rem !important;
+  line-height: 2rem !important;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Dropdown menu */
+.goog-te-menu2 {
+  max-width: 100%;
+}
+
+/* Flex for selected value */
+.goog-te-menu-value {
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+/* Custom language icon */
+.goog-te-menu-value:before {
+  content: "\e894";
+  margin-right: 0.4em;
+  font-family: 'Material Icons';
+  color: @langicon-color;
+}
+
+/* Language text */
+.goog-te-menu-value span {
+  color: @translate-text-color;
+  font-family: @translate-font;
+}
+
+/* Slight alignment */
+.goog-te-menu-value span:nth-child(1) {
+  position: relative;
+  top: 0.07rem;
+}
+
+/* Hide extra icons */
+.goog-te-menu-value span:nth-child(5) {
+  display: none;
+}
+
+/* Dropdown arrow */
+.goog-te-menu-value span:nth-child(3) {
+  border: none !important;
+  font-family: 'Material Icons';
+  display: flex;
+}
+.goog-te-menu-value span:nth-child(3):after {
+  font-family: 'Material Icons';
+  content: "\E5C5";
+  font-size: 1.5rem;
+  color: @downicon-color !important;
+}
+
+/* Hide default Google icon */
+.goog-te-gadget-icon {
+  display: none;
+}
+
+/* Hide top frame banner */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+/* Flag added before language label */
+.goog-te-menu2-item div, .goog-te-menu-value span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Flag icons sizing */
+.lang-flag {
+  width: 20px;
+  height: 14px;
+  object-fit: contain;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Hide translate bar */
+body > .skiptranslate {
+  display: none !important;
+}
+/* General Styles */
+p {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: #2c2c2c;
+  line-height: 1.7;
+  font-size: 16px;
+  background-color: #fdfdfd;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  max-width: 800px;
+  margin: 30px auto;
+  white-space: pre-line; /* Preserves line breaks */
+}
+
+/* Headings inside the paragraph */
+p::first-line {
+  font-weight: bold;
+  font-size: 20px;
+  color: #1e40af;
+}
+
+/* Bold questions (if needed manually) */
+p strong {
+  color: #1f2937;
+}
+
+/* Numbered headings (Key Features) */
+p {
+  counter-reset: feature;
+}
+
+p::before {
+  content: "";
+}
+
+/* Enhance numeric list inside paragraph */
+p {
+  white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  p {
+    font-size: 15px;
+    padding: 20px;
+  }
+}
+</style>
+
+<!-- Container -->
+<div id="google_translate_element"><p>What is PortaFlux?  PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content. Whether you're browsing the latest headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality content,right when you need it.
+  
+  It’s not just a content hub, it’s your daily destination for staying connected, learning something new, and discovering what matters.
+  
+  Key Features of PortaFlux:
+  
+  1. Daily News Feed
+  
+  </p></div>
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Language List -->
+<script>
+  var GoogleLanguages = 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';
+
+  const languageFlags = {
+    'en': 'us',
+    'ar': 'sa',
+    'ja': 'jp',
+    'ko': 'kr',
+    'fr': 'fr',
+    'sv': 'se',
+    'is': 'is',
+    'ro': 'ro',
+    'fi': 'fi',
+    'et': 'ee',
+    'it': 'it',
+    'zh-CN': 'cn',
+    'tl': 'ph'
+  };
+</script>
+
+<!-- Translate Init -->
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'en',
+    includedLanguages: GoogleLanguages,
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+</script>
+
+<!-- Google Translate API -->
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- Add Flags After Dropdown Loads -->
+<script>
+$(document).ready(function () {
+  // Wait for the Google Translate menu to be injected
+  setInterval(() => {
+    $('.goog-te-menu2-item div, .goog-te-menu-value span:first-child').each(function () {
+      const label = $(this).text().trim().toLowerCase();
+      for (const [lang, country] of Object.entries(languageFlags)) {
+        if (label.includes(lang) && !$(this).find('.lang-flag').length) {
+          const flag = `<span class="lang-flag fi fi-${country}"></span>`;
+          $(this).prepend(flag);
+        }
+      }
+    });
+  }, 1000);
+});
+</script>
+
+<!-- External Styling Script (Retained) -->
+<script src="https://storage.googleapis.com/squarestylist/translate-style.js"></script>
