@@ -1,16 +1,51 @@
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <style>
-  /* Your styles unchanged; vars inlined */
-  #google_translate_element { position: fixed; bottom:1vh; right:2vw; z-index:100; }
-  .goog-te-gadget-simple { background: rgba(255,255,255,0.5)!important; border:1px solid black!important; padding:0.2em!important; cursor:pointer; }
-  .goog-te-menu2 table td img { width:20px; height:15px; margin-right:8px; vertical-align:middle; }
-  
-.goog-te-banner-frame.skiptranslate,
-body > .skiptranslate {
-  display: none !important;
-}
+  /* ✅ Your original styles */
+  #google_translate_element {
+    position: fixed;
+    bottom: 1vh;
+    right: 2vw;
+    z-index: 100;
+  }
 
+  .goog-te-gadget-simple {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid black !important;
+    padding: 0.2em !important;
+    cursor: pointer;
+  }
 
+  .goog-te-menu2 table td img {
+    width: 20px;
+    height: 15px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .goog-te-gadget-icon {
+    display: none !important;
+  }
+
+  /* ✅ Final fix to completely hide the banner without breaking dropdown */
+  iframe.goog-te-banner-frame {
+    display: none !important;
+  }
+
+  body {
+    position: relative !important;
+    top: 0px !important;
+  }
+
+  /* ✅ Prevent overlay elements */
+  .goog-te-banner-frame.skiptranslate,
+  .goog-te-balloon-frame {
+    display: none !important;
+  }
+
+  .skiptranslate {
+    display: none !important;
+  }
 </style>
 
 <div id="google_translate_element"><p>What is PortaFlux?  PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content. Whether you're browsing the latest headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality content,right when you need it.
