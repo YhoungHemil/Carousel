@@ -1,0 +1,79 @@
+<html>
+<head>
+  <style>
+    #languageSelector {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      z-index: 9999;
+    }
+
+    body {
+      font-family: sans-serif;
+    }
+
+    /* Hide Google's UI */
+    #google_translate_element,
+    .goog-te-banner-frame,
+    .goog-te-gadget-icon {
+      display: none !important;
+    }
+
+    body {
+      top: 0 !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Your content (outside translate element) -->
+<div id="content">
+  <h1>Welcome to PortaFlux</h1>
+  <p>This is a digital platform designed to inform, entertain, and empower users.</p>
+</div>
+
+<!-- Manual Language Dropdown -->
+<div id="languageSelector">
+  <select id="langSwitch">
+    <option value="">🌐 Select Language</option>
+    <option value="en">🇺🇸 English</option>
+    <option value="ar">🇸🇦 Arabic</option>
+    <option value="fr">🇫🇷 French</option>
+    <option value="sv">🇸🇪 Swedish</option>
+    <option value="zh-CN">🇨🇳 Chinese</option>
+  </select>
+</div>
+
+<!-- Google Translate Hook -->
+<div id="google_translate_element"></div>
+
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,ar,fr,sv,zh-CN',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  document.getElementById('langSwitch').addEventListener('change', function () {
+    const lang = this.value;
+    const combo = document.querySelector('.goog-te-combo');
+    if (combo) {
+      combo.value = lang;
+      combo.dispatchEvent(new Event('change'));
+    }
+  });
+
+  // Clear previously stuck translation
+  document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+</script>
+
+</body>
+</html>
