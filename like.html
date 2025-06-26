@@ -294,7 +294,7 @@
             }
         });
 
-        // Function to trigger Google Translate when a custom language is selected
+        // Function to trigger Google Translate using the hidden select element
         function selectLanguage(langCode, langName, langFlag) {
             // Update the text on the custom dropdown button immediately
             selectedLangText.innerHTML = `${langName} ${langFlag}`;
@@ -302,59 +302,31 @@
             // Store the selected language in localStorage
             localStorage.setItem('selectedPortaFluxLang', langCode);
 
+            // Wait for Google Translate's hidden select element to be available
             let attempts = 0;
             const maxAttempts = 20; // Try for up to 20 * 200ms = 4 seconds
             const intervalTime = 200; // Check every 200ms
 
             const intervalId = setInterval(() => {
-                const frame = document.querySelector('iframe.goog-te-menu-frame');
-                if (frame && frame.contentDocument) {
-                    const innerDoc = frame.contentDocument || frame.contentWindow.document;
-                    // Check if the inner document is fully loaded
-                    if (innerDoc.readyState === 'complete') {
-                        clearInterval(intervalId); // Stop checking once iframe content is ready
+                const googleSelect = document.querySelector('.goog-te-combo');
+                if (googleSelect) {
+                    clearInterval(intervalId); // Stop checking once the select element is found
 
-                        // Google Translate's menu items typically have a data-gt-lang attribute
-                        const targetLink = innerDoc.querySelector(`[data-gt-lang="${langCode}"]`);
-
-                        if (targetLink) {
-                            console.log(`Found Google Translate link for ${langName}. Clicking...`);
-                            targetLink.click(); // Trigger the translation
-                        } else {
-                            console.warn(`Could not find Google Translate link for language code: ${langCode}. Attempting fallback.`);
-                            // Fallback if data-gt-lang isn't found, try by text content (less reliable)
-                            const links = innerDoc.querySelectorAll('.goog-te-menu2 a');
-                            let clickedFallback = false;
-                            links.forEach(link => {
-                                // Specific check for 'Chinese (Simplified)' as its text might vary
-                                if (langCode === 'zh-CN' && (link.textContent.includes('Chinese (Simplified)') || link.textContent.includes('简体中文'))) {
-                                    link.click();
-                                    console.log(`Clicked fallback link for Chinese (Simplified)`);
-                                    clickedFallback = true;
-                                    return;
-                                } else if (link.textContent.trim().toLowerCase().includes(langName.toLowerCase())) {
-                                    link.click();
-                                    console.log(`Clicked fallback link for ${langName}`);
-                                    clickedFallback = true;
-                                    return;
-                                }
-                            });
-                            if (!clickedFallback) {
-                                console.error(`Failed to find any link for ${langName} in Google Translate menu.`);
-                            }
-                        }
+                    // Check if the current language is already selected by Google Translate
+                    // This prevents unnecessary re-translations if the page is already in the target language
+                    if (googleSelect.value !== langCode) {
+                        googleSelect.value = langCode; // Set the value of the hidden select
+                        // Dispatch a 'change' event to notify Google Translate to update the page
+                        googleSelect.dispatchEvent(new Event('change'));
+                        console.log(`Translated to: ${langName} (${langCode})`);
                     } else {
-                        attempts++;
-                        if (attempts >= maxAttempts) {
-                            clearInterval(intervalId);
-                            console.error("Timeout: Google Translate iframe content not ready.");
-                        }
+                        console.log(`Page is already in ${langName}. No translation needed.`);
                     }
                 } else {
                     attempts++;
                     if (attempts >= maxAttempts) {
                         clearInterval(intervalId);
-                        console.error("Timeout: Google Translate iframe not found.");
+                        console.error("Timeout: Google Translate hidden select (.goog-te-combo) not found.");
                     }
                 }
             }, intervalTime);
@@ -369,25 +341,27 @@
                 const targetLang = languages.find(lang => lang.code === savedLangCode);
                 if (targetLang) {
                     console.log(`Applying saved language on load: ${targetLang.name}`);
-                    // Trigger translation to the saved language
                     selectLanguage(targetLang.code, targetLang.name, targetLang.flag);
                 } else {
-                    // If saved language not found in our list, revert to default English
                     console.warn(`Saved language code ${savedLangCode} not found in list. Defaulting to English.`);
                     selectedLangText.innerHTML = `${defaultLang.name} ${defaultLang.flag}`;
+                    // Ensure the Google Translate widget is set to English if no valid saved lang
+                    selectLanguage(defaultLang.code, defaultLang.name, defaultLang.flag);
                 }
             } else {
                 console.log("No language saved. Displaying default English.");
                 selectedLangText.innerHTML = `${defaultLang.name} ${defaultLang.flag}`;
+                // Also, ensure Google Translate widget is set to English
+                selectLanguage(defaultLang.code, defaultLang.name, defaultLang.flag);
             }
         }
 
         // Initialize the custom dropdown and apply saved language once Google Translate is ready
         window.addEventListener('load', () => {
             renderCustomDropdown();
-            // Wait for Google Translate's global object and iframe to be present
+            // Wait for Google Translate's global object and the hidden select to be present
             const readyCheckInterval = setInterval(() => {
-                if (typeof google !== 'undefined' && google.translate && document.querySelector('iframe.goog-te-menu-frame')) {
+                if (typeof google !== 'undefined' && google.translate && document.querySelector('.goog-te-combo')) {
                     clearInterval(readyCheckInterval);
                     console.log("Google Translate components are ready. Attempting to apply saved language.");
                     applySavedLanguageOnLoad();
