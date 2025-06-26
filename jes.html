@@ -36,84 +36,77 @@
   #google_translate_element { display: none; }
   .goog-te-banner-frame.skiptranslate { display: none !important; }
 </style>
+<!-- Google Translate element (hidden) -->
+<div id="google_translate_element" style="display: none;"></div>
 
-<div id="google_translate_element"></div>
-
-<div id="translate-container">
-  <div id="translate-btn">
-    🌐 Translate <span class="material-icons">expand_more</span>
+<!-- Custom Translate Button -->
+<div id="translate-container" style="position: fixed; bottom: 1rem; right: 1rem; z-index: 9999;">
+  <button id="translate-btn">🌐 Translate</button>
+  <div id="lang-menu" style="display: none; background: white; border: 1px solid #ccc; margin-top: 5px;">
+    <div data-lang="en">🇺🇸 English</div>
+    <div data-lang="fr">🇫🇷 French</div>
+    <div data-lang="es">🇪🇸 Spanish</div>
+    <div data-lang="ar">🇸🇦 Arabic</div>
+    <div data-lang="zh-CN">🇨🇳 Chinese</div>
+    <div data-lang="ko">🇰🇷 Korean</div>
   </div>
-  <div id="lang-menu"></div>
 </div>
 
-<div style="padding:2rem;">
-  <h1>What is PortaFlux?</h1>
-  <p>PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower...</p>
+<!-- Main content -->
+<div style="padding: 2rem;">
+  <h1>Welcome to PortaFlux</h1>
+  <p>This is an example paragraph that will be translated.</p>
 </div>
 
-<script>
-  const langMap = {
-    en: '🇺🇸 English',
-    ar: '🇸🇦 Arabic',
-    fr: '🇫🇷 French',
-    es: '🇪🇸 Spanish',
-    ja: '🇯🇵 Japanese',
-    ko: '🇰🇷 Korean',
-    zh: '🇨🇳 Chinese'
-  };
-
-  function googleTranslateInit() {
+<!-- Google Translate Script -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
-      includedLanguages: Object.keys(langMap).join(','),
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
       autoDisplay: false
     }, 'google_translate_element');
   }
 </script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateInit"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script>
   const btn = document.getElementById('translate-btn');
   const menu = document.getElementById('lang-menu');
 
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
+  btn.onclick = () => {
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  });
+  };
 
-  window.addEventListener('click', () => {
-    menu.style.display = 'none';
-  });
+  // Core translation function with retry until combo is ready
+  function setLanguage(lang) {
+    const attempt = () => {
+      const select = document.querySelector('.goog-te-combo');
+      if (!select) {
+        setTimeout(attempt, 100); // Wait until it's injected
+        return;
+      }
 
-  // Populate language menu
-  for (let code in langMap) {
-    const div = document.createElement('div');
-    div.textContent = langMap[code];
-    div.dataset.lang = code;
-    div.addEventListener('click', e => {
-      e.stopPropagation();
-      translateToLang(code);
-      menu.style.display = 'none';
-    });
-    menu.appendChild(div);
-  }
-
-  function translateToLang(lang) {
-    const combo = document.querySelector('.goog-te-combo');
-    if (combo) {
-      combo.value = lang;
-      combo.dispatchEvent(new Event('change'));
+      select.value = lang;
+      select.dispatchEvent(new Event('change'));
       localStorage.setItem('selectedLang', lang);
-    } else {
-      setTimeout(() => translateToLang(lang), 200);
-    }
+    };
+    attempt();
   }
 
+  // Menu click
+  document.querySelectorAll('#lang-menu div').forEach(item => {
+    item.onclick = (e) => {
+      const lang = e.target.getAttribute('data-lang');
+      setLanguage(lang);
+      menu.style.display = 'none';
+    };
+  });
+
+  // Restore saved language
   window.addEventListener('load', () => {
     const saved = localStorage.getItem('selectedLang');
-    if (saved && saved !== 'en') {
-      translateToLang(saved);
+    if (saved) {
+      setLanguage(saved);
     }
   });
-</script>
+      </script>
