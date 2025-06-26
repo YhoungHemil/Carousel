@@ -1,0 +1,105 @@
+<style>
+  #languageSelector {
+    position: fixed;
+    bottom: 1vh;
+    right: 2vw;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 6px;
+    font-family: sans-serif;
+  }
+
+  #languageSelector select {
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  /* Hide Google Translate default elements */
+  #google_translate_element,
+  .goog-te-banner-frame,
+  .goog-te-gadget-icon,
+  .goog-te-balloon-frame,
+  .goog-te-menu-frame,
+  .skiptranslate {
+    display: none !important;
+  }
+
+  body {
+    top: 0px !important;
+  }
+</style>
+
+<!-- Google Translate API placeholder -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<!-- Your Custom Language Dropdown -->
+<div id="languageSelector">
+  <strong>🌍 Choose Language</strong><br />
+  <select id="customLangDropdown">
+    <option value="">🌐 Select Language</option>
+    <option value="en">🇺🇸 English</option>
+    <option value="ar">🇸🇦 Arabic</option>
+    <option value="ja">🇯🇵 Japanese</option>
+    <option value="ko">🇰🇷 Korean</option>
+    <option value="fr">🇫🇷 French</option>
+    <option value="sv">🇸🇪 Swedish</option>
+    <option value="is">🇮🇸 Icelandic</option>
+    <option value="ro">🇷🇴 Romanian</option>
+    <option value="fi">🇫🇮 Finnish</option>
+    <option value="et">🇪🇪 Estonian</option>
+    <option value="it">🇮🇹 Italian</option>
+    <option value="zh-CN">🇨🇳 Chinese</option>
+    <option value="tl">🇵🇭 Filipino</option>
+  </select>
+</div>
+
+<!-- Google Translate JavaScript -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  // Force clear all possible Google Translate cookies and set to default language
+  function clearGoogleTranslateCookies() {
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+      const eqPos = c.indexOf('=');
+      const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+      if (name.startsWith('googtrans') || name.includes('goog')) {
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      }
+    }
+    localStorage.removeItem('googtrans'); // extra layer
+    sessionStorage.removeItem('googtrans');
+  }
+
+  // Call this once on load
+  clearGoogleTranslateCookies();
+
+  // Handle dropdown change
+  document.getElementById("customLangDropdown").addEventListener("change", function () {
+    const selectedLang = this.value;
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = selectedLang;
+      combo.dispatchEvent(new Event("change"));
+    } else {
+      // Retry after short delay (if combo not yet loaded)
+      setTimeout(() => {
+        document.getElementById("customLangDropdown").dispatchEvent(new Event("change"));
+      }, 500);
+    }
+  });
+</script>
