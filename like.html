@@ -1,174 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>PortaFlux Translation</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortaFlux - Multilingual Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS variables from original request */
+        :root {
+            --translate-bg: rgba(255, 255, 255, 0.5);
+            --translate-border: black;
+            --downicon-color: red;
+            --langicon-color: blue;
+            --translate-text-color: black;
+            --translate-font: sans-serif;
+        }
 
-    #translator {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      z-index: 9999;
-    }
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            min-height: 100vh; /* Ensure body takes full height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    #lang-button {
-      background: #ffffffcc;
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        /* Hide the default Google Translate elements */
+        #google_translate_element,
+        .goog-te-gadget,
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
 
-    #lang-list {
-      display: none;
-      position: absolute;
-      bottom: 40px;
-      right: 0;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      max-height: 250px;
-      overflow-y: auto;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+        /* Custom Dropdown Styling */
+        .custom-language-selector {
+            position: fixed;
+            bottom: 2vh;
+            right: 2vw;
+            z-index: 1000;
+        }
 
-    #lang-list div {
-      padding: 8px 10px;
-      cursor: pointer;
-    }
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            background-color: var(--translate-bg);
+            border: 1px solid var(--translate-border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--translate-text-color);
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
 
-    #lang-list div:hover {
-      background: #f0f0f0;
-    }
+        .dropdown-button:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
 
-    .hide-google-stuff {
-      display: none !important;
-    }
-  </style>
+        .dropdown-button .material-icons {
+            margin-right: 0.5rem;
+            color: var(--langicon-color);
+        }
+
+        .dropdown-button .arrow-icon {
+            margin-left: 0.5rem;
+            color: var(--downicon-color);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-button.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            bottom: 100%; /* Position above the button */
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none; /* Hidden by default */
+            max-height: 250px; /* Limit height for scroll */
+            overflow-y: auto;
+        }
+
+        .dropdown-menu.open {
+            display: block; /* Show when open */
+        }
+
+        .dropdown-menu li {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .dropdown-menu li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .dropdown-menu li span {
+            margin-right: 0.5rem; /* Space for flag emoji */
+            font-size: 1.2rem; /* Size of flag emoji */
+        }
+
+        /* Main content styling */
+        .main-content-wrapper {
+            max-width: 900px;
+            width: 90%;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin-top: 2rem;
+            margin-bottom: 80px; /* Space for the fixed language selector */
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .main-content-wrapper h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .main-content-wrapper p {
+            margin-bottom: 1rem;
+        }
+
+        .main-content-wrapper ul {
+            list-style: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .main-content-wrapper ul li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 
-<h1>What is PortaFlux?</h1>
-<p>
-  PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content.
-</p>
+    <!-- This div is where Google Translate will attach its hidden functionality -->
+    <div id="google_translate_element"></div>
 
-<!-- TRANSLATOR UI -->
-<div id="translator">
-  <div id="lang-button">🌐 Translate</div>
-  <div id="lang-list"></div>
-</div>
+    <!-- Main Content of the website -->
+    <div id="main-content" class="main-content-wrapper">
+        <h1>Welcome to PortaFlux</h1>
+        <p>
+            PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless
+            experience across news, movies, tech updates, and smart digital content. Whether you're browsing the latest
+            headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality
+            content, right when you need it.
+        </p>
+        <p>
+            It’s not just a content hub, it’s your daily destination for staying connected, learning something new, and
+            discovering what matters.
+        </p>
+        <p>Key Features of PortaFlux:</p>
+        <ul>
+            <li><strong>Daily News Feed:</strong> Stay informed with real-time updates and breaking news from around
+                the globe. Our intelligent algorithm personalizes your news feed, ensuring you see the stories that
+                matter most to you.</li>
+            <li><strong>Movie & Series Streaming:</strong> Dive into a vast library of films and TV series. From box
+                office hits to indie gems, enjoy high-quality streaming with personalized recommendations tailored to
+                your taste.</li>
+            <li><strong>Tech Insights & Reviews:</strong> Get the latest on technology trends, in-depth product
+                reviews, and expert analyses. Whether you're a gadget enthusiast or a tech professional, PortaFlux keeps
+                you ahead of the curve.</li>
+            <li><strong>Smart Digital Content:</strong> Explore a diverse range of engaging digital content, including
+                podcasts, documentaries, and exclusive interviews. Expand your knowledge and discover new perspectives
+                with content designed for curious minds.</li>
+            <li><strong>Interactive User Experience:</strong> Our intuitive interface makes navigation effortless. Enjoy
+                a clean, ad-minimal environment that puts content first, enhancing your browsing and viewing pleasure.
+            </li>
+            <li><strong>Personalized Recommendations:</strong> PortaFlux learns your preferences over time, offering
+                tailored content suggestions across all categories, ensuring you never miss out on something you'll
+                love.</li>
+            <li><strong>Multi-Device Compatibility:</strong> Access PortaFlux anytime, anywhere. Our platform is
+                optimized for seamless performance across desktops, tablets, and mobile devices, providing a consistent
+                experience on the go.</li>
+        </ul>
+        <p>
+            Join the PortaFlux community today and transform your digital experience. Inform, entertain, empower – all
+            in one place.
+        </p>
+    </div>
 
-<!-- HIDDEN Google Translate div -->
-<div id="google_translate_element" style="display:none;"></div>
+    <!-- Custom Language Selector -->
+    <div class="custom-language-selector">
+        <button id="dropdownBtn" class="dropdown-button">
+            <span class="material-icons">language</span>
+            <span id="selectedLangText">English 🇺🇸</span>
+            <span class="material-icons arrow-icon">expand_more</span>
+        </button>
+        <ul id="languageDropdownMenu" class="dropdown-menu">
+            <!-- Language items will be populated here by JavaScript -->
+        </ul>
+    </div>
 
-<!-- LANGUAGE + FLAG DATA -->
-<script>
-  const languages = {
-    en: "🇺🇸 English",
-    fr: "🇫🇷 French",
-    ar: "🇸🇦 Arabic",
-    ja: "🇯🇵 Japanese",
-    ko: "🇰🇷 Korean",
-    zh-CN: "🇨🇳 Chinese",
-    tl: "🇵🇭 Filipino",
-    it: "🇮🇹 Italian",
-    sv: "🇸🇪 Swedish",
-    is: "🇮🇸 Icelandic",
-    ro: "🇷🇴 Romanian",
-    fi: "🇫🇮 Finnish",
-    et: "🇪🇪 Estonian"
-  };
-</script>
+    <!-- Google Translate API Script -->
+    <script type="text/javascript">
+        // Global variable for Google Translate included languages
+        var GoogleLanguages = 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';
 
-<!-- Google Translate -->
-<script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
-
-<script>
-  function initGoogleTranslate() {
-    new google.translate.TranslateElement({
-      pageLanguage: 'en',
-      includedLanguages: Object.keys(languages).join(','),
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-      autoDisplay: false
-    }, 'google_translate_element');
-  }
-
-  function triggerTranslate(langCode) {
-    const iframe = document.querySelector('iframe.goog-te-menu-frame');
-    if (!iframe) return;
-    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-    const langLinks = innerDoc.querySelectorAll('.goog-te-menu2-item span.text');
-
-    langLinks.forEach(span => {
-      if (span.innerText.toLowerCase().includes(languages[langCode].split(' ')[1].toLowerCase())) {
-        span.click();
-        localStorage.setItem('preferredLang', langCode);
-      }
-    });
-  }
-
-  function buildDropdown() {
-    const dropdown = document.getElementById('lang-list');
-    dropdown.innerHTML = '';
-    for (const code in languages) {
-      const item = document.createElement('div');
-      item.textContent = languages[code];
-      item.onclick = () => {
-        triggerTranslate(code);
-        document.getElementById('lang-button').textContent = languages[code];
-        dropdown.style.display = 'none';
-      };
-      dropdown.appendChild(item);
-    }
-  }
-
-  function restoreLanguage() {
-    const saved = localStorage.getItem('preferredLang');
-    if (saved && saved !== 'en') {
-      const interval = setInterval(() => {
-        const iframe = document.querySelector('iframe.goog-te-menu-frame');
-        if (iframe) {
-          clearInterval(interval);
-          triggerTranslate(saved);
-          document.getElementById('lang-button').textContent = languages[saved];
+        // Initialize Google Translate. It attaches to 'google_translate_element' which is hidden.
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en', // Original language of the page
+                includedLanguages: GoogleLanguages, // Languages available for translation
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false // Important: Prevent Google's default dropdown from showing
+            }, 'google_translate_element');
         }
-      }, 500);
-    }
-  }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-  document.addEventListener('DOMContentLoaded', () => {
-    buildDropdown();
-    restoreLanguage();
+    <script>
+        const languages = [
+            { code: 'en', name: 'English', flag: '🇺🇸' },
+            { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+            { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+            { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+            { code: 'fr', name: 'French', flag: '🇫🇷' },
+            { code: 'sv', name: 'Swedish', flag: '🇸🇪' },
+            { code: 'is', name: 'Icelandic', flag: '🇮🇸' },
+            { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
+            { code: 'fi', name: 'Finnish', flag: '🇫🇮' },
+            { code: 'et', name: 'Estonian', flag: '🇪🇪' },
+            { code: 'it', name: 'Italian', flag: '🇮🇹' },
+            { code: 'zh-CN', name: 'Chinese (Simplified)', flag: '🇨🇳' },
+            { code: 'tl', name: 'Filipino', flag: '🇵🇭' }
+        ];
 
-    const langBtn = document.getElementById('lang-button');
-    const list = document.getElementById('lang-list');
+        const dropdownBtn = document.getElementById('dropdownBtn');
+        const languageDropdownMenu = document.getElementById('languageDropdownMenu');
+        const selectedLangText = document.getElementById('selectedLangText');
 
-    langBtn.addEventListener('click', () => {
-      list.style.display = list.style.display === 'block' ? 'none' : 'block';
-    });
+        let isDropdownOpen = false;
 
-    document.addEventListener('click', (e) => {
-      if (!document.getElementById('translator').contains(e.target)) {
-        list.style.display = 'none';
-      }
-    });
+        // Function to render the custom language dropdown menu
+        function renderCustomDropdown() {
+            languageDropdownMenu.innerHTML = ''; // Clear previous items
+            languages.forEach(lang => {
+                const listItem = document.createElement('li');
+                listItem.dataset.langCode = lang.code;
+                listItem.innerHTML = `<span>${lang.flag}</span>${lang.name}`;
+                languageDropdownMenu.appendChild(listItem);
 
-    // Remove annoying Google banner and feedback links
-    const hideGoogleJunk = setInterval(() => {
-      const banner = document.querySelector('.goog-te-banner-frame');
-      const body = document.querySelector('body');
-      if (banner) banner.style.display = 'none';
-      if (body) body.style.top = '0px';
-    }, 500);
-  });
-</script>
+                // Add click listener to each custom language item
+                listItem.addEventListener('click', () => {
+                    selectLanguage(lang.code, lang.name, lang.flag);
+                    toggleDropdown(); // Close dropdown after selection
+                });
+            });
+        }
 
+        // Function to toggle the visibility of the custom dropdown
+        function toggleDropdown() {
+            isDropdownOpen = !isDropdownOpen;
+            languageDropdownMenu.classList.toggle('open', isDropdownOpen);
+            dropdownBtn.classList.toggle('active', isDropdownOpen);
+        }
+
+        // Event listener for the custom dropdown button
+        dropdownBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent document click from closing immediately
+            toggleDropdown();
+        });
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!languageDropdownMenu.contains(event.target) && !dropdownBtn.contains(event.target)) {
+                if (isDropdownOpen) {
+                    toggleDropdown();
+                }
+            }
+        });
+
+        // Function to trigger Google Translate when a custom language is selected
+        function selectLanguage(langCode, langName, langFlag) {
+            // Update the text on the custom dropdown button immediately
+            selectedLangText.innerHTML = `${langName} ${langFlag}`;
+
+            // Store the selected language in localStorage
+            localStorage.setItem('selectedPortaFluxLang', langCode);
+
+            let attempts = 0;
+            const maxAttempts = 20; // Try for up to 20 * 200ms = 4 seconds
+            const intervalTime = 200; // Check every 200ms
+
+            const intervalId = setInterval(() => {
+                const frame = document.querySelector('iframe.goog-te-menu-frame');
+                if (frame && frame.contentDocument) {
+                    const innerDoc = frame.contentDocument || frame.contentWindow.document;
+                    // Check if the inner document is fully loaded
+                    if (innerDoc.readyState === 'complete') {
+                        clearInterval(intervalId); // Stop checking once iframe content is ready
+
+                        // Google Translate's menu items typically have a data-gt-lang attribute
+                        const targetLink = innerDoc.querySelector(`[data-gt-lang="${langCode}"]`);
+
+                        if (targetLink) {
+                            console.log(`Found Google Translate link for ${langName}. Clicking...`);
+                            targetLink.click(); // Trigger the translation
+                        } else {
+                            console.warn(`Could not find Google Translate link for language code: ${langCode}. Attempting fallback.`);
+                            // Fallback if data-gt-lang isn't found, try by text content (less reliable)
+                            const links = innerDoc.querySelectorAll('.goog-te-menu2 a');
+                            let clickedFallback = false;
+                            links.forEach(link => {
+                                // Specific check for 'Chinese (Simplified)' as its text might vary
+                                if (langCode === 'zh-CN' && (link.textContent.includes('Chinese (Simplified)') || link.textContent.includes('简体中文'))) {
+                                    link.click();
+                                    console.log(`Clicked fallback link for Chinese (Simplified)`);
+                                    clickedFallback = true;
+                                    return;
+                                } else if (link.textContent.trim().toLowerCase().includes(langName.toLowerCase())) {
+                                    link.click();
+                                    console.log(`Clicked fallback link for ${langName}`);
+                                    clickedFallback = true;
+                                    return;
+                                }
+                            });
+                            if (!clickedFallback) {
+                                console.error(`Failed to find any link for ${langName} in Google Translate menu.`);
+                            }
+                        }
+                    } else {
+                        attempts++;
+                        if (attempts >= maxAttempts) {
+                            clearInterval(intervalId);
+                            console.error("Timeout: Google Translate iframe content not ready.");
+                        }
+                    }
+                } else {
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        clearInterval(intervalId);
+                        console.error("Timeout: Google Translate iframe not found.");
+                    }
+                }
+            }, intervalTime);
+        }
+
+        // Apply saved language on page load
+        function applySavedLanguageOnLoad() {
+            const savedLangCode = localStorage.getItem('selectedPortaFluxLang');
+            const defaultLang = languages.find(lang => lang.code === 'en'); // Default to English
+
+            if (savedLangCode) {
+                const targetLang = languages.find(lang => lang.code === savedLangCode);
+                if (targetLang) {
+                    console.log(`Applying saved language on load: ${targetLang.name}`);
+                    // Trigger translation to the saved language
+                    selectLanguage(targetLang.code, targetLang.name, targetLang.flag);
+                } else {
+                    // If saved language not found in our list, revert to default English
+                    console.warn(`Saved language code ${savedLangCode} not found in list. Defaulting to English.`);
+                    selectedLangText.innerHTML = `${defaultLang.name} ${defaultLang.flag}`;
+                }
+            } else {
+                console.log("No language saved. Displaying default English.");
+                selectedLangText.innerHTML = `${defaultLang.name} ${defaultLang.flag}`;
+            }
+        }
+
+        // Initialize the custom dropdown and apply saved language once Google Translate is ready
+        window.addEventListener('load', () => {
+            renderCustomDropdown();
+            // Wait for Google Translate's global object and iframe to be present
+            const readyCheckInterval = setInterval(() => {
+                if (typeof google !== 'undefined' && google.translate && document.querySelector('iframe.goog-te-menu-frame')) {
+                    clearInterval(readyCheckInterval);
+                    console.log("Google Translate components are ready. Attempting to apply saved language.");
+                    applySavedLanguageOnLoad();
+                }
+            }, 200); // Check every 200ms
+        });
+    </script>
 </body>
 </html>
