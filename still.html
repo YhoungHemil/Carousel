@@ -1,4 +1,6 @@
+<!-- Material Icons (optional) -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
 <style>
   #custom_translate_dropdown {
     position: fixed;
@@ -17,18 +19,7 @@
     border-radius: 4px;
     border: 1px solid #aaa;
     font-size: 14px;
-    width: 200px;
-  }
-
-  #custom_translate_dropdown option {
-    background-repeat: no-repeat;
-    background-size: 20px 20px;
-    padding-left: 30px;
-  }
-
-  .translate-label {
-    margin-bottom: 6px;
-    font-weight: bold;
+    width: 220px;
   }
 
   .goog-te-banner-frame.skiptranslate,
@@ -47,29 +38,29 @@
 
 <!-- Manual Dropdown Menu -->
 <div id="custom_translate_dropdown">
-  <div class="translate-label">🌐 Translate</div>
+  <div><strong>🌐 Choose Language</strong></div>
   <select id="language_selector">
-    <option value="">Select Language</option>
-    <option value="en" data-flag="us">🇺🇸 English</option>
-    <option value="ar" data-flag="sa">🇸🇦 Arabic</option>
-    <option value="ja" data-flag="jp">🇯🇵 Japanese</option>
-    <option value="ko" data-flag="kr">🇰🇷 Korean</option>
-    <option value="fr" data-flag="fr">🇫🇷 French</option>
-    <option value="sv" data-flag="se">🇸🇪 Swedish</option>
-    <option value="is" data-flag="is">🇮🇸 Icelandic</option>
-    <option value="ro" data-flag="ro">🇷🇴 Romanian</option>
-    <option value="fi" data-flag="fi">🇫🇮 Finnish</option>
-    <option value="et" data-flag="ee">🇪🇪 Estonian</option>
-    <option value="it" data-flag="it">🇮🇹 Italian</option>
-    <option value="zh-CN" data-flag="cn">🇨🇳 Chinese (Simplified)</option>
-    <option value="tl" data-flag="ph">🇵🇭 Filipino</option>
+    <option value="">🌍 Select Language</option>
+    <option value="en">🇺🇸 English</option>
+    <option value="ar">🇸🇦 Arabic</option>
+    <option value="ja">🇯🇵 Japanese</option>
+    <option value="ko">🇰🇷 Korean</option>
+    <option value="fr">🇫🇷 French</option>
+    <option value="sv">🇸🇪 Swedish</option>
+    <option value="is">🇮🇸 Icelandic</option>
+    <option value="ro">🇷🇴 Romanian</option>
+    <option value="fi">🇫🇮 Finnish</option>
+    <option value="et">🇪🇪 Estonian</option>
+    <option value="it">🇮🇹 Italian</option>
+    <option value="zh-CN">🇨🇳 Chinese (Simplified)</option>
+    <option value="tl">🇵🇭 Filipino</option>
   </select>
 </div>
 
-<!-- Hidden Google Translate Logic -->
-<div id="google_translate_element" style="display:none;"></div>
+<!-- Google Translate Placeholder -->
+<div id="google_translate_element" style="display: none;"></div>
 
-<!-- Content -->
+<!-- Your Website Content -->
 <div style="padding: 2em; max-width: 800px;">
   <p>
     <strong>What is PortaFlux?</strong><br><br>
@@ -82,34 +73,41 @@
   </p>
 </div>
 
-<!-- Google Translate Script -->
-<script>
-  var GoogleLanguages = 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl';
+<!-- jQuery (optional for compatibility) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+<!-- Google Translate -->
+<script type="text/javascript">
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
-      includedLanguages: GoogleLanguages,
+      includedLanguages: 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl',
       layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
       autoDisplay: false
     }, 'google_translate_element');
   }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-  // Change Language Function
+<!-- Manual Language Switcher Script -->
+<script>
   function changeLanguage(lang) {
-    const select = document.querySelector('.goog-te-combo');
-    if (select) {
-      select.value = lang;
-      select.dispatchEvent(new Event('change'));
+    const combo = document.querySelector('.goog-te-combo');
+    if (!combo) {
+      setTimeout(() => changeLanguage(lang), 500); // Retry after delay
+      return;
     }
+    combo.value = lang;
+    combo.dispatchEvent(new Event('change'));
   }
 
-  // Dropdown listener
   document.getElementById('language_selector').addEventListener('change', function () {
     const lang = this.value;
-    if (lang) changeLanguage(lang);
+    if (lang) {
+      changeLanguage(lang);
+    }
   });
-</script>
 
-<!-- Load Google Translate -->
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  // Disable automatic translation by removing Google cookies
+  document.cookie = 'googtrans=/auto/en; path=/; domain=' + location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      </script>
