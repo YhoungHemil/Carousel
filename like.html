@@ -1,0 +1,107 @@
+<!-- Hidden Google Translate container -->
+<div id="google_translate_element" style="display: none;"></div>
+
+<!-- Floating Translate Button UI -->
+<div id="translate-container" style="position: fixed; bottom: 1rem; right: 1rem; z-index: 9999; font-family: sans-serif;">
+  <button id="translate-btn" style="padding: 8px 12px; border-radius: 5px; border: none; background: #f3f3f3; cursor: pointer;">
+    🌐 Translate
+  </button>
+  <div id="lang-menu" style="display: none; position: absolute; bottom: 120%; right: 0; background: white; border: 1px solid #ccc; border-radius: 5px; overflow: hidden;">
+    <div data-lang="en" data-label="English">🇺🇸 English</div>
+    <div data-lang="fr" data-label="French">🇫🇷 French</div>
+    <div data-lang="es" data-label="Spanish">🇪🇸 Spanish</div>
+    <div data-lang="ar" data-label="Arabic">🇸🇦 Arabic</div>
+    <div data-lang="zh-CN" data-label="Chinese">🇨🇳 Chinese</div>
+    <div data-lang="ko" data-label="Korean">🇰🇷 Korean</div>
+  </div>
+</div>
+
+<!-- Demo content -->
+<div style="padding: 2rem;">
+  <h1>Welcome to PortaFlux</h1>
+  <p>This is an example paragraph that will be translated.</p>
+</div>
+
+<!-- Google Translate Script -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  const btn = document.getElementById('translate-btn');
+  const menu = document.getElementById('lang-menu');
+
+  // Toggle menu
+  btn.onclick = () => {
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  };
+
+  // Update the main button text to selected language
+  function updateButton(lang, label) {
+    const flagMap = {
+      'en': '🇺🇸',
+      'fr': '🇫🇷',
+      'es': '🇪🇸',
+      'ar': '🇸🇦',
+      'zh-CN': '🇨🇳',
+      'ko': '🇰🇷'
+    };
+    btn.innerHTML = `${flagMap[lang] || '🌐'} ${label}`;
+  }
+
+  // Set language
+  function setLanguage(lang, label) {
+    const applyTranslation = () => {
+      const select = document.querySelector('.goog-te-combo');
+      if (!select) return setTimeout(() => setLanguage(lang, label), 100);
+
+      // Check if language already set to avoid blocking further changes
+      if (select.value !== lang) {
+        select.value = lang;
+        select.dispatchEvent(new Event('change'));
+      } else {
+        // Force reapply translation workaround (Google bug)
+        select.value = '';
+        select.dispatchEvent(new Event('change'));
+        setTimeout(() => {
+          select.value = lang;
+          select.dispatchEvent(new Event('change'));
+        }, 100);
+      }
+
+      updateButton(lang, label);
+      localStorage.setItem('selectedLang', lang);
+      localStorage.setItem('selectedLabel', label);
+    };
+    applyTranslation();
+  }
+
+  // Handle language option clicks
+  document.querySelectorAll('#lang-menu div').forEach(item => {
+    item.onclick = (e) => {
+      const lang = e.target.getAttribute('data-lang');
+      const label = e.target.getAttribute('data-label');
+      setLanguage(lang, label);
+      menu.style.display = 'none';
+    };
+  });
+
+  // Restore saved language
+  window.addEventListener('load', () => {
+    const savedLang = localStorage.getItem('selectedLang');
+    const savedLabel = localStorage.getItem('selectedLabel');
+    if (savedLang && savedLabel) {
+      setLanguage(savedLang, savedLabel);
+    }
+  });
+
+  // Hide dropdown on outside click
+  window.addEventListener('click', function (e) {
+    if (!document.getElementById('translate-container').contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
