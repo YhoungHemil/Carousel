@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Translation with Flags</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        :root {
+            --translate-bg: rgba(255, 255, 255, 0.95);
+            --translate-border: #333;
+            --downicon-color: #007bff;
+            --langicon-color: #28a745;
+            --translate-text-color: #333;
+            --translate-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--translate-font);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* Hide Google's default translate element but keep it functional */
+        #google_translate_element {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .goog-te-gadget {
+            display: none !important;
+        }
+
+        /* Custom translator styles */
+        .custom-translator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .translator-button {
+            background: var(--translate-bg);
+            border: 2px solid var(--translate-border);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--translate-font);
+            font-size: 14px;
+            color: var(--translate-text-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .translator-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .language-icon {
+            color: var(--langicon-color);
+            font-size: 18px;
+        }
+
+        .dropdown-arrow {
+            color: var(--downicon-color);
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .translator-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .language-dropdown {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 5px;
+            background: white;
+            border: 2px solid var(--translate-border);
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--translate-text-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .language-option:hover {
+            background-color: #f8f9fa;
+        }
+
+        .language-option.selected {
+            background-color: #e3f2fd;
+            font-weight: bold;
+        }
+
+        .flag-emoji {
+            font-size: 18px;
+        }
+
+        .language-name {
+            flex: 1;
+        }
+
+        /* Content styles */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .feature-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        /* Google Translate frame hiding */
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element"></div>
+
+    <!-- Custom Translator -->
+    <div class="custom-translator">
+        <div class="translator-button" id="translatorBtn">
+            <span class="material-icons language-icon">language</span>
+            <span id="currentLang">English</span>
+            <span class="flag-emoji" id="currentFlag">🇺🇸</span>
+            <span class="material-icons dropdown-arrow">expand_more</span>
+        </div>
+        <div class="language-dropdown" id="languageDropdown">
+            <!-- Language options will be populated here -->
+        </div>
+    </div>
+
+    <!-- Website Content -->
+    <div class="content">
+        <h1>What is PortaFlux?</h1>
+        
+        <p>PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content. Whether you're browsing the latest headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality content right when you need it.</p>
+        
+        <p>It's not just a content hub, it's your daily destination for staying connected, learning something new, and discovering what matters.</p>
+        
+        <div class="feature-section">
+            <h2>Key Features of PortaFlux:</h2>
+            
+            <ul class="feature-list">
+                <li><strong>Daily News Feed:</strong> Stay updated with the latest news from around the world, curated from trusted sources and presented in an easy-to-digest format.</li>
+                
+                <li><strong>Entertainment Hub:</strong> Discover trending movies, TV shows, and entertainment content tailored to your interests and preferences.</li>
+                
+                <li><strong>Tech Updates:</strong> Get the latest technology news, reviews, and insights from the world of innovation and digital transformation.</li>
+                
+                <li><strong>Smart Content Curation:</strong> Our intelligent algorithms learn your preferences to deliver personalized content recommendations.</li>
+                
+                <li><strong>Multi-Device Sync:</strong> Access your content seamlessly across all your devices with cloud synchronization.</li>
+                
+                <li><strong>Interactive Community:</strong> Engage with other users through comments, discussions, and content sharing features.</li>
+                
+                <li><strong>Offline Reading:</strong> Save articles and content for offline reading when you're on the go.</li>
+                
+                <li><strong>Real-time Notifications:</strong> Stay informed with customizable push notifications for breaking news and trending topics.</li>
+            </ul>
+        </div>
+        
+        <div class="feature-section">
+            <h2>Why Choose PortaFlux?</h2>
+            <p>In today's fast-paced digital world, finding reliable, quality content can be challenging. PortaFlux solves this problem by bringing together the best of news, entertainment, and technology in one unified platform. Our commitment to quality, user experience, and innovation makes us the perfect choice for anyone looking to stay informed and entertained.</p>
+            
+            <p>Join millions of users who trust PortaFlux for their daily dose of information and entertainment. Experience the difference of having everything you need in one place, designed with you in mind.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        // Language configuration with flags
+        const languages = [
+            { code: 'en', name: 'English', flag: '🇺🇸' },
+            { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+            { code: 'ja', name: '日本語', flag: '🇯🇵' },
+            { code: 'ko', name: '한국어', flag: '🇰🇷' },
+            { code: 'fr', name: 'Français', flag: '🇫🇷' },
+            { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+            { code: 'is', name: 'Íslenska', flag: '🇮🇸' },
+            { code: 'ro', name: 'Română', flag: '🇷🇴' },
+            { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+            { code: 'et', name: 'Eesti', flag: '🇪🇪' },
+            { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+            { code: 'zh-CN', name: '中文', flag: '🇨🇳' },
+            { code: 'tl', name: 'Filipino', flag: '🇵🇭' }
+        ];
+
+        let currentLanguage = 'en';
+        let googleTranslateReady = false;
+
+        // Initialize Google Translate
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: languages.map(lang => lang.code).join(','),
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            // Wait for Google Translate to be ready and ensure elements are loaded
+            const checkGoogleReady = setInterval(() => {
+                const selectElement = document.querySelector('.goog-te-combo');
+                if (selectElement) {
+                    googleTranslateReady = true;
+                    clearInterval(checkGoogleReady);
+                    loadSavedLanguage();
+                    
+                    // Force visibility of the translate elements for functionality
+                    const gtGadget = document.querySelector('.goog-te-gadget');
+                    if (gtGadget) {
+                        gtGadget.style.position = 'absolute';
+                        gtGadget.style.top = '-9999px';
+                        gtGadget.style.left = '-9999px';
+                        gtGadget.style.width = '1px';
+                        gtGadget.style.height = '1px';
+                        gtGadget.style.opacity = '0';
+                        gtGadget.style.pointerEvents = 'none';
+                        gtGadget.style.display = 'block';
+                    }
+                }
+            }, 100);
+            
+            // Fallback timeout
+            setTimeout(() => {
+                if (!googleTranslateReady) {
+                    googleTranslateReady = true;
+                    loadSavedLanguage();
+                }
+            }, 3000);
+        }
+
+        // Create dropdown options
+        function createDropdownOptions() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.innerHTML = '';
+            
+            languages.forEach(lang => {
+                const option = document.createElement('div');
+                option.className = 'language-option';
+                option.dataset.code = lang.code;
+                
+                option.innerHTML = `
+                    <span class="flag-emoji">${lang.flag}</span>
+                    <span class="language-name">${lang.name}</span>
+                `;
+                
+                option.addEventListener('click', () => selectLanguage(lang));
+                dropdown.appendChild(option);
+            });
+            
+            updateSelectedOption();
+        }
+
+        // Update selected option in dropdown
+        function updateSelectedOption() {
+            const options = document.querySelectorAll('.language-option');
+            options.forEach(option => {
+                option.classList.toggle('selected', option.dataset.code === currentLanguage);
+            });
+        }
+
+        // Select language and trigger translation
+        function selectLanguage(language) {
+            if (!googleTranslateReady) return;
+            
+            currentLanguage = language.code;
+            
+            // Update button display
+            document.getElementById('currentLang').textContent = language.name;
+            document.getElementById('currentFlag').textContent = language.flag;
+            
+            // Update dropdown selection
+            updateSelectedOption();
+            
+            // Hide dropdown
+            toggleDropdown(false);
+            
+            // Save language preference
+            localStorage.setItem('selectedLanguage', language.code);
+            
+            // Trigger Google Translate using multiple methods for reliability
+            triggerTranslation(language.code);
+        }
+        
+        // Robust translation trigger function
+        function triggerTranslation(langCode) {
+            // Method 1: Try the combo select element
+            let selectElement = document.querySelector('.goog-te-combo');
+            if (selectElement) {
+                selectElement.value = langCode === 'en' ? '' : langCode;
+                selectElement.dispatchEvent(new Event('change'));
+                return;
+            }
+            
+            // Method 2: Try finding Google Translate frame and trigger from there
+            setTimeout(() => {
+                const frames = document.querySelectorAll('iframe');
+                for (let frame of frames) {
+                    try {
+                        if (frame.src && frame.src.includes('translate.google')) {
+                            const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                            const select = frameDoc.querySelector('select.goog-te-combo');
+                            if (select) {
+                                select.value = langCode === 'en' ? '' : langCode;
+                                select.dispatchEvent(new Event('change'));
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        // Cross-origin frame access might fail, continue
+                    }
+                }
+                
+                // Method 3: Try clicking on the Google Translate element directly
+                const gtElement = document.querySelector('#google_translate_element');
+                if (gtElement) {
+                    const event = new Event('click', { bubbles: true });
+                    gtElement.dispatchEvent(event);
+                    
+                    setTimeout(() => {
+                        const select = document.querySelector('.goog-te-combo');
+                        if (select) {
+                            select.value = langCode === 'en' ? '' : langCode;
+                            select.dispatchEvent(new Event('change'));
+                        }
+                    }, 100);
+                }
+            }, 100);
+        }
+
+        // Toggle dropdown visibility
+        function toggleDropdown(show = null) {
+            const dropdown = document.getElementById('languageDropdown');
+            const button = document.getElementById('translatorBtn');
+            
+            if (show === null) {
+                show = !dropdown.classList.contains('show');
+            }
+            
+            dropdown.classList.toggle('show', show);
+            button.classList.toggle('active', show);
+        }
+
+        // Load saved language preference
+        function loadSavedLanguage() {
+            const savedLang = localStorage.getItem('selectedLanguage');
+            if (savedLang && savedLang !== 'en') {
+                const language = languages.find(lang => lang.code === savedLang);
+                if (language) {
+                    // Wait a bit more for Google Translate to be fully ready
+                    setTimeout(() => {
+                        selectLanguage(language);
+                    }, 1500);
+                }
+            }
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            createDropdownOptions();
+            
+            // Button click handler
+            document.getElementById('translatorBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleDropdown();
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.custom-translator')) {
+                    toggleDropdown(false);
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside it
+            document.getElementById('languageDropdown').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        // Monitor for Google Translate changes and update our UI accordingly
+        setInterval(() => {
+            if (googleTranslateReady) {
+                const selectElement = document.querySelector('.goog-te-combo');
+                if (selectElement && selectElement.value !== currentLanguage) {
+                    const newLang = selectElement.value || 'en';
+                    const language = languages.find(lang => lang.code === newLang);
+                    if (language && language.code !== currentLanguage) {
+                        currentLanguage = language.code;
+                        document.getElementById('currentLang').textContent = language.name;
+                        document.getElementById('currentFlag').textContent = language.flag;
+                        updateSelectedOption();
+                    }
+                }
+            }
+        }, 500);
+        
+        // Additional check to ensure translation works
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                // Force Google Translate elements to be accessible
+                const gtElements = document.querySelectorAll('#google_translate_element *');
+                gtElements.forEach(el => {
+                    if (el.style) {
+                        el.style.display = el.style.display === 'none' ? 'block' : el.style.display;
+                        if (el.classList.contains('goog-te-gadget')) {
+                            el.style.position = 'absolute';
+                            el.style.top = '-9999px';
+                            el.style.left = '-9999px';
+                            el.style.width = '1px';
+                            el.style.height = '1px';
+                            el.style.opacity = '0';
+                        }
+                    }
+                });
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
