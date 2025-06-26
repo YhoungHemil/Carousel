@@ -1,107 +1,174 @@
-<!-- Hidden Google Translate container -->
-<div id="google_translate_element" style="display: none;"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PortaFlux Translation</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
 
-<!-- Floating Translate Button UI -->
-<div id="translate-container" style="position: fixed; bottom: 1rem; right: 1rem; z-index: 9999; font-family: sans-serif;">
-  <button id="translate-btn" style="padding: 8px 12px; border-radius: 5px; border: none; background: #f3f3f3; cursor: pointer;">
-    🌐 Translate
-  </button>
-  <div id="lang-menu" style="display: none; position: absolute; bottom: 120%; right: 0; background: white; border: 1px solid #ccc; border-radius: 5px; overflow: hidden;">
-    <div data-lang="en" data-label="English">🇺🇸 English</div>
-    <div data-lang="fr" data-label="French">🇫🇷 French</div>
-    <div data-lang="es" data-label="Spanish">🇪🇸 Spanish</div>
-    <div data-lang="ar" data-label="Arabic">🇸🇦 Arabic</div>
-    <div data-lang="zh-CN" data-label="Chinese">🇨🇳 Chinese</div>
-    <div data-lang="ko" data-label="Korean">🇰🇷 Korean</div>
-  </div>
+    #translator {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 9999;
+    }
+
+    #lang-button {
+      background: #ffffffcc;
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #lang-list {
+      display: none;
+      position: absolute;
+      bottom: 40px;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      max-height: 250px;
+      overflow-y: auto;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #lang-list div {
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    #lang-list div:hover {
+      background: #f0f0f0;
+    }
+
+    .hide-google-stuff {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<h1>What is PortaFlux?</h1>
+<p>
+  PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content.
+</p>
+
+<!-- TRANSLATOR UI -->
+<div id="translator">
+  <div id="lang-button">🌐 Translate</div>
+  <div id="lang-list"></div>
 </div>
 
-<!-- Demo content -->
-<div style="padding: 2rem;">
-  <h1>Welcome to PortaFlux</h1>
-  <p>This is an example paragraph that will be translated.</p>
-</div>
+<!-- HIDDEN Google Translate div -->
+<div id="google_translate_element" style="display:none;"></div>
 
-<!-- Google Translate Script -->
-<script type="text/javascript">
-  function googleTranslateElementInit() {
-    new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
-  }
+<!-- LANGUAGE + FLAG DATA -->
+<script>
+  const languages = {
+    en: "🇺🇸 English",
+    fr: "🇫🇷 French",
+    ar: "🇸🇦 Arabic",
+    ja: "🇯🇵 Japanese",
+    ko: "🇰🇷 Korean",
+    zh-CN: "🇨🇳 Chinese",
+    tl: "🇵🇭 Filipino",
+    it: "🇮🇹 Italian",
+    sv: "🇸🇪 Swedish",
+    is: "🇮🇸 Icelandic",
+    ro: "🇷🇴 Romanian",
+    fi: "🇫🇮 Finnish",
+    et: "🇪🇪 Estonian"
+  };
 </script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- Google Translate -->
+<script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate"></script>
 
 <script>
-  const btn = document.getElementById('translate-btn');
-  const menu = document.getElementById('lang-menu');
-
-  // Toggle menu
-  btn.onclick = () => {
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  };
-
-  // Update the main button text to selected language
-  function updateButton(lang, label) {
-    const flagMap = {
-      'en': '🇺🇸',
-      'fr': '🇫🇷',
-      'es': '🇪🇸',
-      'ar': '🇸🇦',
-      'zh-CN': '🇨🇳',
-      'ko': '🇰🇷'
-    };
-    btn.innerHTML = `${flagMap[lang] || '🌐'} ${label}`;
+  function initGoogleTranslate() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: Object.keys(languages).join(','),
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
   }
 
-  // Set language
-  function setLanguage(lang, label) {
-    const applyTranslation = () => {
-      const select = document.querySelector('.goog-te-combo');
-      if (!select) return setTimeout(() => setLanguage(lang, label), 100);
+  function triggerTranslate(langCode) {
+    const iframe = document.querySelector('iframe.goog-te-menu-frame');
+    if (!iframe) return;
+    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const langLinks = innerDoc.querySelectorAll('.goog-te-menu2-item span.text');
 
-      // Check if language already set to avoid blocking further changes
-      if (select.value !== lang) {
-        select.value = lang;
-        select.dispatchEvent(new Event('change'));
-      } else {
-        // Force reapply translation workaround (Google bug)
-        select.value = '';
-        select.dispatchEvent(new Event('change'));
-        setTimeout(() => {
-          select.value = lang;
-          select.dispatchEvent(new Event('change'));
-        }, 100);
+    langLinks.forEach(span => {
+      if (span.innerText.toLowerCase().includes(languages[langCode].split(' ')[1].toLowerCase())) {
+        span.click();
+        localStorage.setItem('preferredLang', langCode);
       }
-
-      updateButton(lang, label);
-      localStorage.setItem('selectedLang', lang);
-      localStorage.setItem('selectedLabel', label);
-    };
-    applyTranslation();
+    });
   }
 
-  // Handle language option clicks
-  document.querySelectorAll('#lang-menu div').forEach(item => {
-    item.onclick = (e) => {
-      const lang = e.target.getAttribute('data-lang');
-      const label = e.target.getAttribute('data-label');
-      setLanguage(lang, label);
-      menu.style.display = 'none';
-    };
-  });
-
-  // Restore saved language
-  window.addEventListener('load', () => {
-    const savedLang = localStorage.getItem('selectedLang');
-    const savedLabel = localStorage.getItem('selectedLabel');
-    if (savedLang && savedLabel) {
-      setLanguage(savedLang, savedLabel);
+  function buildDropdown() {
+    const dropdown = document.getElementById('lang-list');
+    dropdown.innerHTML = '';
+    for (const code in languages) {
+      const item = document.createElement('div');
+      item.textContent = languages[code];
+      item.onclick = () => {
+        triggerTranslate(code);
+        document.getElementById('lang-button').textContent = languages[code];
+        dropdown.style.display = 'none';
+      };
+      dropdown.appendChild(item);
     }
-  });
+  }
 
-  // Hide dropdown on outside click
-  window.addEventListener('click', function (e) {
-    if (!document.getElementById('translate-container').contains(e.target)) {
-      menu.style.display = 'none';
+  function restoreLanguage() {
+    const saved = localStorage.getItem('preferredLang');
+    if (saved && saved !== 'en') {
+      const interval = setInterval(() => {
+        const iframe = document.querySelector('iframe.goog-te-menu-frame');
+        if (iframe) {
+          clearInterval(interval);
+          triggerTranslate(saved);
+          document.getElementById('lang-button').textContent = languages[saved];
+        }
+      }, 500);
     }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    buildDropdown();
+    restoreLanguage();
+
+    const langBtn = document.getElementById('lang-button');
+    const list = document.getElementById('lang-list');
+
+    langBtn.addEventListener('click', () => {
+      list.style.display = list.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('translator').contains(e.target)) {
+        list.style.display = 'none';
+      }
+    });
+
+    // Remove annoying Google banner and feedback links
+    const hideGoogleJunk = setInterval(() => {
+      const banner = document.querySelector('.goog-te-banner-frame');
+      const body = document.querySelector('body');
+      if (banner) banner.style.display = 'none';
+      if (body) body.style.top = '0px';
+    }, 500);
   });
 </script>
+
+</body>
+</html>
