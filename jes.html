@@ -1,0 +1,197 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<style>
+  :root {
+    --translate-bg: rgba(255, 255, 255, 0.5);
+    --translate-border: black;
+    --downicon-color: red;
+    --langicon-color: blue;
+    --translate-text-color: black;
+    --translate-font: sans-serif;
+  }
+
+  body {
+    top: 0px !important;
+  }
+
+  #custom_translate {
+    position: fixed;
+    bottom: 1vh;
+    right: 2vw;
+    z-index: 1000;
+    font-family: var(--translate-font);
+  }
+
+  #translateBtn {
+    background-color: var(--translate-bg);
+    border: 1px solid var(--translate-border);
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--translate-text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  #translateDropdown {
+    display: none;
+    position: absolute;
+    bottom: 2.8em;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid var(--translate-border);
+    border-radius: 5px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+    width: max-content;
+    white-space: nowrap;
+    z-index: 9999;
+  }
+
+  #translateDropdown div {
+    padding: 0.5em 1em;
+    cursor: pointer;
+  }
+
+  #translateDropdown div:hover {
+    background-color: #f0f0f0;
+  }
+
+  .goog-te-banner-frame.skiptranslate {
+    display: none !important;
+  }
+
+  body {
+    top: 0px !important;
+  }
+
+  .goog-te-gadget {
+    display: none !important;
+  }
+
+  #google_translate_element {
+    display: none;
+  }
+</style>
+
+<!-- Hidden Google Translate Container -->
+<div id="google_translate_element"></div>
+
+<!-- Visible Custom Manual Dropdown -->
+<div id="custom_translate">
+  <div id="translateBtn">
+    🌐 Translate
+    <span class="material-icons">expand_more</span>
+  </div>
+  <div id="translateDropdown"></div>
+</div>
+
+<!-- Website Content -->
+<div style="padding: 2em;">
+  <h1>What is PortaFlux?</h1>
+  <p>
+    PortaFlux is an all-in-one digital platform designed to inform, entertain, and empower users with a seamless experience across news, movies, tech updates, and smart digital content.
+    Whether you're browsing the latest headlines, streaming trending videos, or exploring tech insights, PortaFlux delivers curated, quality content, right when you need it.
+
+    It’s not just a content hub, it’s your daily destination for staying connected, learning something new, and discovering what matters.
+
+    <br><br><strong>Key Features of PortaFlux:</strong><br>
+    1. Daily News Feed
+  </p>
+</div>
+
+<!-- Google Translate -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,ar,ja,ko,fr,sv,is,ro,fi,et,it,zh-CN,tl',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+  const langMap = {
+    'en': '🇺🇸 English',
+    'ar': '🇸🇦 Arabic',
+    'ja': '🇯🇵 Japanese',
+    'ko': '🇰🇷 Korean',
+    'fr': '🇫🇷 French',
+    'sv': '🇸🇪 Swedish',
+    'is': '🇮🇸 Icelandic',
+    'ro': '🇷🇴 Romanian',
+    'fi': '🇫🇮 Finnish',
+    'et': '🇪🇪 Estonian',
+    'it': '🇮🇹 Italian',
+    'zh-CN': '🇨🇳 Chinese (Simplified)',
+    'tl': '🇵🇭 Filipino'
+  };
+
+  function triggerTranslate(langCode) {
+    const iframe = document.querySelector('iframe.goog-te-menu-frame');
+    if (!iframe) return;
+
+    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const langLinks = innerDoc.querySelectorAll('.goog-te-menu2 a');
+
+    langLinks.forEach(link => {
+      const txt = link.textContent.trim().toLowerCase();
+      if (txt.includes(langMap[langCode].split(' ')[1].toLowerCase())) {
+        link.click();
+        localStorage.setItem('selectedLang', langCode);
+      }
+    });
+  }
+
+  function buildCustomDropdown() {
+    const dropdown = document.getElementById('translateDropdown');
+    for (let code in langMap) {
+      const option = document.createElement('div');
+      option.textContent = langMap[code];
+      option.dataset.lang = code;
+      dropdown.appendChild(option);
+    }
+
+    dropdown.addEventListener('click', (e) => {
+      if (e.target.dataset.lang) {
+        triggerTranslate(e.target.dataset.lang);
+        dropdown.style.display = 'none';
+      }
+    });
+  }
+
+  function waitForGoogleTranslateFrame(callback) {
+    const checkExist = setInterval(() => {
+      const iframe = document.querySelector('iframe.goog-te-menu-frame');
+      if (iframe) {
+        clearInterval(checkExist);
+        callback();
+      }
+    }, 500);
+  }
+
+  function restoreLanguageOnLoad() {
+    const savedLang = localStorage.getItem('selectedLang');
+    if (savedLang && savedLang !== 'en') {
+      waitForGoogleTranslateFrame(() => {
+        triggerTranslate(savedLang);
+      });
+    }
+  }
+
+  document.getElementById('translateBtn').addEventListener('click', () => {
+    const dropdown = document.getElementById('translateDropdown');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  window.addEventListener('load', () => {
+    buildCustomDropdown();
+    restoreLanguageOnLoad();
+  });
+</script>
