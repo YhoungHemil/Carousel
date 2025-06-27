@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .language-selector {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            border: 1px solid #ccc;
+            z-index: 1;
+        }
+        .dropdown div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .dropdown div:hover {
+            background-color: #f1f1f1;
+        }
+        .show { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="language-selector">
+    <button onclick="toggleDropdown()">Select Language</button>
+    <div id="myDropdown" class="dropdown">
+        <div onclick="translate('en')">🇺🇸 English</div>
+        <div onclick="translate('fr')">🇫🇷 Français</div>
+        <div onclick="translate('es')">🇪🇸 Español</div>
+        <div onclick="translate('de')">🇩🇪 Deutsch</div>
+        <div onclick="translate('am')">🇦🇲 Armenian</div>
+    </div>
+</div>
+
+<div id="content">
+    <h1>Welcome to Our Website</h1>
+    <p>This is a sample content that will be translated.</p>
+</div>
+
+<script>
+    let googleTranslateElement;
+
+    function toggleDropdown() {
+        document.getElementById("myDropdown").classList.toggle("show");
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.language-selector button')) {
+            var dropdowns = document.getElementsByClassName("dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+
+    function translate(language) {
+        if (googleTranslateElement) {
+            googleTranslateElement.setEnabled(true);
+            googleTranslateElement.setLanguage(language);
+        }
+    }
+
+    function googleTranslateElementInit() {
+        googleTranslateElement = new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,fr,es,de,am',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+    }
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
