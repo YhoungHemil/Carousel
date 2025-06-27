@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortaFlux - Multilingual Platform</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
+  
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -146,9 +147,52 @@
             padding: 25px;
             font-size: 1.1rem;
         }
-        
-        /* Custom language selector styles */
+        /* Custom language selector styles - TOP POSITION */
         .custom-language-selector {
+        position: fixed;
+        top: 10px; /* Adjust this value to position vertically */
+        right: 3000px; /* Adjust this value to position horizontally */
+        z-index: 1000;
+        max-width: 200px;
+        }
+        
+        .language-dropdown {
+        position: absolute;
+        top: 100%; /* Changed from bottom: 100% */
+        right: 3000;
+        background: white;
+        border: 2px solid #2c3e50;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-height: 400px;
+        overflow-y: auto;
+        display: none;
+        z-index: 101;
+        width: 200px;
+        }
+        
+        /* Animation adjustment for top position */
+        @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); } /* Changed from translateY(20px) */
+        to { opacity: 1; transform: translateY(0); }
+        }
+     
+        .language-button {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #2c3e50;
+            border-radius: 50px;
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            min-width: 60px;
+            max-width: 100%;
+        }
         
         .language-button:hover {
             background: white;
@@ -181,22 +225,6 @@
             transform: rotate(180deg);
         }
         
-        .language-dropdown {
-        position: absolute;
-        top: 100%; /* Changed from bottom: 100% */
-        right: 3000;
-        background: white;
-        border: 2px solid #2c3e50;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        max-height: 400px;
-        overflow-y: auto;
-        display: none;
-        z-index: 101;
-        width: 200px;
-        }
-        
-      
         
         .language-dropdown.open {
             display: block;
@@ -294,51 +322,7 @@
             background: #4a6491;
             transform: translateY(-3px);
         }
-        /* Custom language selector styles */
-.custom-language-selector {
-  position: fixed;
-  top: 20px; /* Adjust this value */
-  right: 20px; /* Adjust this value */
-  z-index: 1000;
-  max-width: 200px;
-  transition: all 0.3s ease;
-}
-
-.language-button {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 2px solid #2c3e50;
-  border-radius: 50px;
-  padding: 12px 15px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #2c3e50;
-  font-weight: 600;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  min-width: 60px;
-  max-width: 100%;
-}
-
-/* Rest of your existing styles remain the same... */
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .custom-language-selector {
-    top: 15px;
-    right: 15px;
-  }
-  
-  .language-button {
-    padding: 10px 15px;
-    font-size: 0.9rem;
-  }
-  
-  .current-language {
-    max-width: 80px;
-  }
-      }
+        
         /* Animations */
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -346,10 +330,6 @@
             100% { transform: scale(1); }
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
         
         /* Responsive design */
         @media (max-width: 768px) {
@@ -367,9 +347,19 @@
                 font-size: 1.2rem;
             }
             
+            .custom-language-selector {
+                bottom: 20px;
+                right: 20px;
+            }
             
+            .language-button {
+                padding: 10px 20px;
+            }
         }
-    </style>
+     </style>
+
+        
+        
 </head>
 <body>
     <div class="container">
