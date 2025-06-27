@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Discover Luxury</title>
+  <style>
+    /* SAME CSS (UNCHANGED) */
+    .luxury-container {
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    .luxury-text {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .luxury-text h2 {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: #111;
+    }
+    .luxury-text p {
+      font-size: 18px;
+      color: #444;
+    }
+    .luxury-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      justify-items: center;
+    }
+    .luxury-item {
+      width: 100%;
+      max-width: 250px;
+      text-align: center;
+      background: #fff;
+      padding: 10px;
+      border-radius: 15px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .luxury-item:hover {
+      transform: scale(1.03);
+    }
+    .luxury-item img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .luxury-item p {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+    }
+    @media screen and (max-width: 768px) {
+      .luxury-gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .image-modal.active {
+      display: flex;
+    }
+    .image-modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      max-width: 90vw;
+      max-height: 90vh;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .image-modal-content img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 10px;
+    }
+    .image-modal-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<section id="discoverLuxury" class="luxury-container">
+  <div class="luxury-text">
+    <h2>Discover Luxury</h2>
+    <p>Explore the latest curated pieces of elegance from the PortaFlux community.</p>
+  </div>
+  <div class="luxury-gallery" id="luxuryGallery">
+    <!-- Images injected here -->
+  </div>
+</section>
+
+<div class="image-modal" id="imageModal">
+  <div class="image-modal-content">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" src="" alt="Preview">
+  </div>
+</div>
+
+<script>
+  const allLuxuryImages = [
+    'luxury-images/img1.jpg',
+    'luxury-images/img2.jpg',
+    'luxury-images/img3.jpg',
+    'luxury-images/img4.jpg',
+    'luxury-images/img5.jpg',
+    'luxury-images/img6.jpg',
+    'luxury-images/img7.jpg',
+    'luxury-images/img8.jpg',
+    'luxury-images/img9.jpg',
+    'luxury-images/img10.jpg',
+    'luxury-images/img11.jpg',
+    'luxury-images/img12.jpg'
+  ];
+
+  const galleryContainer = document.getElementById('luxuryGallery');
+  const ONE_MINUTES = 1 * 60 * 1000; // 1 minute
+
+  function getStoredGalleryData() {
+    try {
+      return JSON.parse(localStorage.getItem('luxuryGalleryData')) || { indexes: [], timestamp: 0 };
+    } catch {
+      return { indexes: [], timestamp: 0 };
+    }
+  }
+
+  function saveGalleryData(indexes) {
+    localStorage.setItem('luxuryGalleryData', JSON.stringify({
+      indexes,
+      timestamp: Date.now()
+    }));
+  }
+
+  function getUniqueRandomIndexes(count, max) {
+    const indexes = new Set();
+    while (indexes.size < count) {
+      indexes.add(Math.floor(Math.random() * max));
+    }
+    return Array.from(indexes);
+  }
+
+  function renderGallery(images) {
+    galleryContainer.innerHTML = '';
+    images.forEach((src, i) => {
+      const div = document.createElement('div');
+      div.className = 'luxury-item';
+      div.setAttribute('onclick', `openImageModal('luxuryImage${i}')`);
+      div.innerHTML = `
+        <img id="luxuryImage${i}" src="${src}" alt="Luxury Image ${i + 1}"
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/250x160?text=Image+Missing'">
+        <p>Luxury Item ${i + 1}</p>`;
+      galleryContainer.appendChild(div);
+    });
+  }
+
+  function initGallery() {
+    const now = Date.now();
+    const stored = getStoredGalleryData();
+    let indexes = stored.indexes;
+
+    if (!indexes.length || now - stored.timestamp >= ONE_MINUTES) {
+      indexes = getUniqueRandomIndexes(4, allLuxuryImages.length);
+      saveGalleryData(indexes);
+    }
+
+    const selectedImages = indexes.map(i => allLuxuryImages[i]);
+    renderGallery(selectedImages);
+  }
+
+  // Modal controls
+  function openImageModal(imageId) {
+    const img = document.getElementById(imageId);
+    if (img) {
+      document.getElementById('modalImage').src = img.src;
+      document.getElementById('imageModal').classList.add('active');
+    }
+  }
+
+  function closeImageModal() {
+    document.getElementById('imageModal').classList.remove('active');
+  }
+
+  // Ensure DOM is ready
+  window.addEventListener('DOMContentLoaded', initGallery);
+</script>
+
+</body>
+</html>
