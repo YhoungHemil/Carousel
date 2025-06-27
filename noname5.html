@@ -107,6 +107,27 @@
       color: #333;
       cursor: pointer;
     }
+            /* Google Translate element */
+        #google_translate_element {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        /* Google Translate banner hiding */
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+        
+        .skiptranslate {
+            display: none !important;
+        }
+        
+        body {
+            top: 0 !important;
+        
   </style>
 </head>
 <body>
@@ -114,7 +135,17 @@
 <section id="discoverLuxury" class="luxury-container">
   <div class="luxury-text">
     <h2>Discover Luxury</h2>
-    <p>Explore the latest curated pieces of elegance from the PortaFlux community.</p>
+    <p>Explore the latest curated pieces of elegance from the PortaFlux community.🎬 Welcome to the PortaFlux Community!
+
+At PortaFlux, we're more than just a streaming platform — we're a global community of movie lovers, news seekers, and content creators. Whether you're here for the latest African news, epic movie nights, or to share your own creative work, you belong here.
+
+👥 Join the conversation.
+💡 Share your thoughts.
+📺 Discover something new every day.
+
+Together, we make PortaFlux a place where stories come to life.
+
+#PortaFluxCommunity | #StreamBoldly</p>
   </div>
   <div class="luxury-gallery" id="luxuryGallery">
     <!-- Images injected here -->
@@ -127,7 +158,57 @@
     <img id="modalImage" src="" alt="Preview">
   </div>
 </div>
+     <!-- Google Translate element (REQUIRED ON EVERY PAGE) -->
+    <div id="google_translate_element"></div>
+  
+ <!-- COMMON JAVASCRIPT (REQUIRED ON ALL PAGES) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        // Google Translate initialization (REQUIRED ON ALL PAGES)
+        function googleTranslateElementInit() {
+            // Hardcoded included languages string
+            const includedLanguages = 'af,sq,am,ar,hy,az,eu,be,bn,bs,bg,ca,ceb,ny,zh-CN,zh-TW,co,hr,cs,da,nl,en,eo,et,tl,fi,fr,fy,gl,ka,de,el,gu,ht,ha,haw,he,hi,hmn,hu,is,ig,id,ga,it,ja,jw,kn,kk,km,rw,ko,ku,ky,lo,la,lv,lt,lb,mk,mg,ms,ml,mt,mi,mr,mn,my,ne,no,or,ps,fa,pl,pt,pa,ro,ru,sm,gd,sr,st,sn,sd,si,sk,sl,so,es,su,sw,sv,tg,ta,tt,te,th,tr,tk,uk,ur,ug,uz,vi,cy,xh,yi,yo,zu';
+            
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: includedLanguages,
+                layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+                autoDisplay: false
+            }, 'google_translate_element');
 
+            // Load saved language preference
+            const savedLang = localStorage.getItem('selectedLang');
+            if (savedLang) {
+                // Wait for the Google Translate element to be ready
+                const interval = setInterval(() => {
+                    const select = document.querySelector('.goog-te-combo');
+                    if (select) {
+                        select.value = savedLang;
+                        select.dispatchEvent(new Event('change'));
+                        clearInterval(interval);
+                    }
+                }, 100);
+            }
+        }
+        
+        // Handle Google Translate events
+        function handleTranslateEvent() {
+            const select = document.querySelector('.goog-te-combo');
+            if (select) {
+                const lang = select.value;
+                localStorage.setItem('selectedLang', lang);
+            }
+        }
+        
+        // Monitor for Google Translate changes
+        setInterval(() => {
+            const select = document.querySelector('.goog-te-combo');
+            if (select) {
+                select.addEventListener('change', handleTranslateEvent);
+            }
+        }, 1000);
+    </script>
 <script>
   const allLuxuryImages = [
     'luxury-images/img1.jpg',
